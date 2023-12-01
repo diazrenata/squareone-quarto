@@ -1,0 +1,198 @@
+---
+title: "Appendix S1 - Plot-level analysis"
+subtitle: "Supplemental information for Diaz and Ernest, “Maintenance of community function through compensation breaks down over time in a desert rodent community”. In review at Ecology."
+author: Renata Diaz
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+---
+
+```{r setup, include=T, echo = F, results = F, warning = F, message = F}
+knitr::opts_chunk$set(echo = F,  warning = F, message = F)
+
+library(soar)
+library(ggplot2)
+library(dplyr)
+library(multipanelfigure)
+library(nlme)
+library(emmeans)
+
+theme_set(theme_bw())
+
+
+# Get data using `portalr`:
+#treatl <- get_treatment_means() 
+# Alternatively, read data from `data/`:
+# treatl <- read.csv(here::here("data", "treatl.csv"), stringsAsFactors = T)
+
+# This section is new. Load data using `get_plot_totals` so that you can remove an exclosure plot (resulting in a balanced set of 4 exclosures and 4 controls)
+
+plotl <- get_plot_totals()
+
+plot_types <- list_plot_types() %>% filter(plot_type == "EE")
+
+set.seed(1977) # 1977 is my usual Portal seed
+remove_plot <- sample(plot_types$plot, 1, F)
+
+plotl <- plotl %>%
+  filter(plot != remove_plot)
+
+
+# For interpretability, translating the era and treatment "names" as RMD coded them for analysis to the corresponding dates:
+
+
+oera_df <- data.frame(
+  oera = c("a_pre_pb", "b_pre_reorg", "c_post_reorg"),
+  `Timeperiod` = c("1988-1997", "1997-2010", "2010-2020")
+)
+
+oplot_df <- data.frame(
+  oplottype = c("CC", "EE"),
+  `Treatment` = c("Control", "Exclosure")
+)
+
+contrasts_df <- data.frame(
+  contrast = c("a_pre_pb - b_pre_reorg", "a_pre_pb - c_post_reorg", "b_pre_reorg - c_post_reorg"),
+  Comparison = c("1988-1997 - 1997-2010", "1988-1997 - 2010-2020", "1997-2010 - 2010-2020")
+)
+
+```
+
+\newpage
+
+# Explanation
+
+In order to  calculate energetic compensation and the total energy ratio, we require an estimate for the baseline values of total energy use, kangaroo rat energy use, and small granivore energy use on control plots. Estimating these baselines requires aggregating over between-plot variability among the control plots. For consistency, in the main analysis, we also aggregate across the exclosure plots and focus on treatment-level means throughout. Here, we explore the effect of between-plot variability on our analyses, to the extent possible. 
+We used treatment-level means across control plots to calculate energetic compensation and the total energy ratio, but calculated these quantities separately for each exclosure plot, and conducted analyses including a random effect of plot. We also conducted analyses of *Dipodomys* and *C. baileyi* proportional energy use using plot-level data, again including plot as a random effect. Results were qualitatively the same as using treatment-level means. 
+
+<!-- # Calculations of compensation and the total energy ratio -->
+
+```{r, echo = F}
+
+control_means <- plotl %>%
+  filter(plot_type == "CC") %>%
+  group_by(period) %>%
+  summarize(mean_total_e = mean(total_e),
+            mean_dipo_e = mean(dipo_e),
+            mean_smgran_e = mean(smgran_e)) %>%
+  ungroup() 
+
+plotl_vars <- plotl %>%
+  left_join(control_means) %>%
+  mutate(energy_ratio = total_e / mean_total_e,
+         compensation = (smgran_e - mean_smgran_e) / mean_dipo_e,
+         dipo_ratio = dipo_e / total_e,
+         pb_ratio = pb_e / total_e) %>%
+  filter(plot != remove_plot)
+
+compensation_dat <- filter(plotl_vars, oplottype == "EE")
+total_e_dat <- filter(plotl_vars, oplottype == "EE")
+pb_dat <- filter(plotl_vars, as.numeric(oera) > 1)
+dipo_c_dat <- filter(plotl_vars, oplottype == "CC")
+```
+
+\newpage
+
+# Compensation
+
+## Model specification and selection
+
+
+We fit linear mixed-effects models (using the `lme` function in the R package `nlme`; Pinheiro et al. 2021) of the form `compensation ~ time period` with a random effect of plot and temporal autocorrelation structure to account for autocorrelation between monthly census periods within each time period. We compared these to models without the autocorrelation structure, without the random effect, and without the term for time period. The best-fitting model included terms for time period, random effect of plot, and autocorrelation.
+
+
+### Table S1. Model comparison for compensation.
+
+
+```{r, echo = F}
+
+# Full model:
+comp_plot_gls <- lme(compensation ~ oera , random = ~1|fplot,  correlation = corCAR1(form = ~ period | fplot), data = compensation_dat)
+
+# No autocorrelation term:
+comp_plot_gls_noautoc <- lme(compensation ~ oera , random = ~1|fplot, data = compensation_dat)
+
+# No random effect of plot:
+comp_plot_gls_norandom <- gls(compensation ~ oera , correlation = corCAR1(form = ~ period | fplot), data = compensation_dat)
+
+# No term for time period:
+comp_plot_gls_notime <- lme(compensation ~ 1 , random = ~1|fplot,  correlation = corCAR1(form = ~ period | fplot), data = compensation_dat)
+
+# No term for time period, or autocorrelation term:
+comp_plot_gls_notime_nocor <- lme(compensation ~ 1 , random = ~1|fplot, data = compensation_dat)
+
+# No terms - intercept-only null model:
+comp_plot_gls_notime_nocor_norand <- gls(compensation ~ 1 , data = compensation_dat)
+
+
+compensation_comparison<- data.frame(
+  `Model specification` = c("intercept + timeperiod + plot (random effect) + autocorrelation",
+                            "intercept + timeperiod + plot (random effect)",
+                            "intercept + timeperiod + autocorrelation" ,
+                            "intercept + plot (random effect) + autocorrelation",
+                            "intercept + plot (random effect)",
+                            "intercept"),
+  AIC = c(AIC(comp_plot_gls),
+          AIC(comp_plot_gls_noautoc),
+          AIC(comp_plot_gls_norandom),
+          AIC(comp_plot_gls_notime),
+          AIC(comp_plot_gls_notime_nocor),
+          AIC(comp_plot_gls_notime_nocor_norand))
+)
+
+
+compensation_comparison
+
+```
+
+
+```{r, echo = F}
+comp_mean_gls_emmeans <- emmeans(comp_plot_gls, specs = ~ oera)
+
+```
+
+
+## Results
+
+### Table S2. Coefficients from linear mixed-effects model for compensation
+
+Note that "oera" is the variable name for the term for time period in these analyses. 
+
+
+```{r}
+compensation_coef <- as.data.frame(summary(comp_plot_gls)$tTable)
+compensation_coef
+```
+
+
+### Table S3. Estimates from linear mixed-effects model for compensation 
+
+```{r}
+
+compensation_estimates <- oera_df %>% 
+  left_join(as.data.frame(comp_mean_gls_emmeans)) %>%
+  select(-oera)
+compensation_estimates
+
+```
+
+### Table S4. Contrasts from linear mixed-effects model for compensation 
+
+```{r}
+compensation_contrasts <- contrasts_df %>% 
+  left_join(as.data.frame(pairs(comp_mean_gls_emmeans))) %>%
+  select(-contrast) %>%
+  mutate(p.value = round(p.value, digits = 4))
+compensation_contrasts
+
+```
+
+
+# References
+
+Bates, Douglas, Martin Maechler, Ben Bolker, Steve Walker (2015). _Fitting Linear Mixed-Effects Models Using lme4._ Journal of Statistical Software, 67(1), 1-48. doi:10.18637/jss.v067.i01.
+
+Lenth,  Russell V. (2021). emmeans: _Estimated Marginal Means, aka Least-Squares Means._ R package version 1.7.0. <URL: https://CRAN.R-project.org/package=emmeans>
+
+Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2021). _nlme: Linear and Nonlinear Mixed Effects Models_. R package version 3.1-153, <URL: https://CRAN.R-project.org/package=nlme>.
