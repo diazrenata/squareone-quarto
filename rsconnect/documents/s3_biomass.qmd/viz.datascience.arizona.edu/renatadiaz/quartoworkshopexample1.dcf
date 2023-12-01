@@ -1,0 +1,12 @@
+name: quartoworkshopexample1
+title: quartoworkshopexample1
+username: renatadiaz
+account: renatadiaz
+server: viz.datascience.arizona.edu
+hostUrl: https://viz.datascience.arizona.edu/__api__
+appId: 946
+bundleId: 3991
+url: https://viz.datascience.arizona.edu:443/content/ff911dc4-fac9-488d-a899-292881989123/
+version: 1
+asMultiple: FALSE
+asStatic: TRUE

@@ -1,0 +1,4 @@
+- source: s3_biomass.qmd
+  quarto-pub:
+    - id: c4417a5b-51d0-404c-97a5-f17a7e0924c5
+      url: 'https://cct-datascience.quarto.pub/quartoworkshopexample1'

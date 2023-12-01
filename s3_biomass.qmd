@@ -5,8 +5,7 @@ author:
     orcid: 0000-0003-0803-4734
     email: renata.diaz@weecology.org
 output: 
-   html_document:
-     toc: true
+   html_document
 bibliography: refs.bib
 ---
 
