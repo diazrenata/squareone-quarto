@@ -121,239 +121,165 @@ div.csl-indent {
 </section>
 <section id="compensation" class="level1">
 <h1>Compensation</h1>
-<p>Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (<a href="#fig-plot">Figure&nbsp;1</a>, panel B). We fit a generalized least squares (of the form <em>compensation ~ timeperiod</em>; note that “timeperiod” is coded as “oera” throughout) using the <code>gls</code> function from the R package <code>nlme</code> <span class="citation" data-cites="pinheiro2023">(<a href="#ref-pinheiro2023" role="doc-biblioref">Pinheiro, Bates, and R Core Team 2023</a>)</span>. Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the <code>CORCAR1</code> function). We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC, and we used this model to calculate estimates and contrasts using the package <code>emmeans</code> <span class="citation" data-cites="lenth2023">(<a href="#ref-lenth2023" role="doc-biblioref">Lenth et al. 2023</a>)</span>.</p>
-<section id="table-s1.-model-comparison-for-compensation." class="level3">
-<h3 class="anchored" data-anchor-id="table-s1.-model-comparison-for-compensation.">Table S1. Model comparison for compensation.</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                       Model.specification        AIC
-1 intercept + timeperiod + autocorrelation -17.623354
-2              intercept + autocorrelation  -3.297103
-3                   intercept + timeperiod  92.184205
-4                                intercept 207.804481</code></pre>
-</div>
-</div>
+<p>Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (<a href="#fig-plot">Figure&nbsp;1</a>). We fit a generalized least squares (of the form <em>compensation ~ timeperiod</em>; note that “timeperiod” is coded as “oera” throughout) using the <code>gls</code> function from the R package <code>nlme</code> <span class="citation" data-cites="pinheiro2023">(<a href="#ref-pinheiro2023" role="doc-biblioref">Pinheiro, Bates, and R Core Team 2023</a>)</span>. Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the <code>CORCAR1</code> function). We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC (<strong>?@tbl-comp</strong>), and we used this model to calculate estimates and contrasts using the package <code>emmeans</code> <span class="citation" data-cites="lenth2023">(<a href="#ref-lenth2023" role="doc-biblioref">Lenth et al. 2023</a>)</span> (<strong>?@tbl-ests</strong>, <strong>?@tbl-contrasts</strong>).</p>
 </section>
-<section id="table-s2.-coefficients-from-gls-for-compensation" class="level3">
-<h3 class="anchored" data-anchor-id="table-s2.-coefficients-from-gls-for-compensation">Table S2. Coefficients from GLS for compensation</h3>
-<p>Note that “oera” is the variable name for the term for time period in these analyses.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                  Value  Std.Error   t-value      p-value
-(Intercept)  0.30814431 0.02905391 10.605950 6.936638e-23
-oera.L       0.07114123 0.05141306  1.383719 1.673549e-01
-oera.Q      -0.27991205 0.04652521 -6.016352 4.624854e-09</code></pre>
+<section id="tables" class="level1">
+<h1>Tables</h1>
+<div id="tbl-comp" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p><strong>?(caption)</strong></p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model.specification</th>
+<th style="text-align: right;">AIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">intercept + timeperiod + autocorrelation</td>
+<td style="text-align: right;">-17.623354</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">intercept + autocorrelation</td>
+<td style="text-align: right;">-3.297103</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">intercept + timeperiod</td>
+<td style="text-align: right;">92.184205</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">intercept</td>
+<td style="text-align: right;">207.804481</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-</section>
-<section id="table-s3.-estimates-from-gls-for-compensation" class="level3">
-<h3 class="anchored" data-anchor-id="table-s3.-estimates-from-gls-for-compensation">Table S3. Estimates from GLS for compensation</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>  Timeperiod    emmean         SE       df   lower.CL  upper.CL
-1  1988-1997 0.1435663 0.05114193 39.40368 0.04015581 0.2469767
-2  1997-2010 0.5366915 0.04527450 42.04303 0.44532669 0.6280564
-3  2010-2020 0.2441751 0.05172050 41.30488 0.13974688 0.3486034</code></pre>
+</div>
+<div id="tbl-ests" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p><strong>?(caption)</strong></p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Timeperiod</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">lower.CL</th>
+<th style="text-align: right;">upper.CL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1988-1997</td>
+<td style="text-align: right;">0.1435663</td>
+<td style="text-align: right;">0.0511419</td>
+<td style="text-align: right;">39.40368</td>
+<td style="text-align: right;">0.0401558</td>
+<td style="text-align: right;">0.2469767</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1997-2010</td>
+<td style="text-align: right;">0.5366915</td>
+<td style="text-align: right;">0.0452745</td>
+<td style="text-align: right;">42.04303</td>
+<td style="text-align: right;">0.4453267</td>
+<td style="text-align: right;">0.6280564</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2010-2020</td>
+<td style="text-align: right;">0.2441751</td>
+<td style="text-align: right;">0.0517205</td>
+<td style="text-align: right;">41.30488</td>
+<td style="text-align: right;">0.1397469</td>
+<td style="text-align: right;">0.3486034</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-</section>
-<section id="table-s4.-contrasts-from-gls-for-compensation" class="level3">
-<h3 class="anchored" data-anchor-id="table-s4.-contrasts-from-gls-for-compensation">Table S4. Contrasts from GLS for compensation</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>             Comparison   estimate         SE       df   t.ratio p.value
-1 1988-1997 - 1997-2010 -0.3931253 0.06738108 43.35973 -5.834357  0.0000
-2 1988-1997 - 2010-2020 -0.1006089 0.07270904 40.49222 -1.383719  0.3588
-3 1997-2010 - 2010-2020  0.2925164 0.06780029 44.56438  4.314383  0.0003</code></pre>
+</div>
+<div id="tbl-contrasts" class="cell tbl-parent quarto-layout-panel anchored">
+<div class="panel-caption table-caption">
+<p><strong>?(caption)</strong></p>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Comparison</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">t.ratio</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1988-1997 - 1997-2010</td>
+<td style="text-align: right;">-0.3931253</td>
+<td style="text-align: right;">0.0673811</td>
+<td style="text-align: right;">43.35973</td>
+<td style="text-align: right;">-5.834358</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1988-1997 - 2010-2020</td>
+<td style="text-align: right;">-0.1006089</td>
+<td style="text-align: right;">0.0727090</td>
+<td style="text-align: right;">40.49222</td>
+<td style="text-align: right;">-1.383719</td>
+<td style="text-align: right;">0.3588</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1997-2010 - 2010-2020</td>
+<td style="text-align: right;">0.2925164</td>
+<td style="text-align: right;">0.0678003</td>
+<td style="text-align: right;">44.56438</td>
+<td style="text-align: right;">4.314383</td>
+<td style="text-align: right;">0.0003</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 <div style="page-break-after: always;"></div>
 </section>
-</section>
-<section id="total-biomass-ratio" class="level1">
-<h1>Total biomass ratio</h1>
-<p>As for compensation, we fit a generalized least squares of the form <em>total_biomass_ratio ~ timeperiod</em>, accounting for temporal autocorrelation between monthly censuses within each time period using a continuous autoregressive autocorrelation structure of order 1. We compared this model to models fit without the timeperiod term and/or autocorrelation structure, and found the full (timeperiod plus autocorrelation) model had the best performance via AIC. We used this model for estimates and contrasts.</p>
-<section id="table-s5.-model-comparison-for-total-biomass-ratio." class="level3">
-<h3 class="anchored" data-anchor-id="table-s5.-model-comparison-for-total-biomass-ratio.">Table S5. Model comparison for total biomass ratio.</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                       Model.specification        AIC
-1 intercept + timeperiod + autocorrelation -176.57761
-2              intercept + autocorrelation -162.61339
-3                   intercept + timeperiod  -15.98438
-4                                intercept  146.61442</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s6.-coefficients-from-gls-on-total-biomass-ratio" class="level3">
-<h3 class="anchored" data-anchor-id="table-s6.-coefficients-from-gls-on-total-biomass-ratio">Table S6. Coefficients from GLS on total biomass ratio</h3>
-<p>Note that “oera” is the variable name for the term for time period in these analyses.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                 Value  Std.Error   t-value      p-value
-(Intercept)  0.4553971 0.02724184 16.716827 3.547602e-46
-oera.L       0.1454493 0.04779892  3.042941 2.525739e-03
-oera.Q      -0.2531409 0.04273433 -5.923594 7.735453e-09</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s7.-estimates-from-gls-on-total-biomass-ratio" class="level3">
-<h3 class="anchored" data-anchor-id="table-s7.-estimates-from-gls-on-total-biomass-ratio">Table S7. Estimates from GLS on total biomass ratio</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>  Timeperiod    emmean         SE       df  lower.CL  upper.CL
-1  1988-1997 0.2492046 0.04765836 33.83193 0.1523334 0.3460757
-2  1997-2010 0.6620857 0.04195145 35.99319 0.5770036 0.7471677
-3  2010-2020 0.4549009 0.04802155 34.99486 0.3574115 0.5523903</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s8.-contrasts-from-gls-on-total-biomass-ratio" class="level3">
-<h3 class="anchored" data-anchor-id="table-s8.-contrasts-from-gls-on-total-biomass-ratio">Table S8. Contrasts from GLS on total biomass ratio</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>             Comparison   estimate         SE       df   t.ratio p.value
-1 1988-1997 - 1997-2010 -0.4128811 0.06217389 38.43597 -6.640747  0.0000
-2 1988-1997 - 2010-2020 -0.2056963 0.06759788 34.68472 -3.042941  0.0121
-3 1997-2010 - 2010-2020  0.2071848 0.06243247 39.21256  3.318542  0.0054</code></pre>
-</div>
-</div>
-<div style="page-break-after: always;"></div>
-</section>
-</section>
-<section id="kangaroo-rat-dipodomys-proportional-biomass" class="level1">
-<h1>Kangaroo rat (Dipodomys) proportional biomass</h1>
-<p>Proportional biomass is bounded 0-1 and cannot be fit with generalized least squares. We therefore used a binomial generalized linear model with no temporal autocorrelation term, of the form <em>dipodomys_proportional_biomass ~ timeperiod</em>. We compared a model fit with a timeperiod term to an intercept-only (null) model using AIC, and found the timeperiod term improved model fit. We used this model for estimates and contrasts.</p>
-<section id="table-s9.-model-comparison-for-dipodomys-proportional-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s9.-model-comparison-for-dipodomys-proportional-biomass.">Table S9. Model comparison for Dipodomys proportional biomass.</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>     Model.specification      AIC
-1 intercept + timeperiod 215.2069
-2              intercept 227.9608</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s10.-coefficients-from-glm-on-dipodomys-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s10.-coefficients-from-glm-on-dipodomys-biomass.">Table S10. Coefficients from GLM on Dipodomys biomass.</h3>
-<p>Note that “oera” is the variable name for the term for time period in these analyses. Coefficients are given on the link (logit) scale.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>              Estimate Std. Error   z value     Pr(&gt;|z|)
-(Intercept)  1.6149566  0.1644937  9.817741 9.443577e-23
-oera.L      -1.1672395  0.3180813 -3.669626 2.429058e-04
-oera.Q       0.6619048  0.2473324  2.676175 7.446776e-03</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s11.-estimates-from-glm-on-dipodomys-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s11.-estimates-from-glm-on-dipodomys-biomass.">Table S11. Estimates from GLM on Dipodomys biomass.</h3>
-<p>Note that estimates are back-transformed onto the response scale, for interpretability.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>  Timeperiod      prob         SE  df asymp.LCL asymp.UCL
-1  1988-1997 0.9376458 0.02264595 Inf 0.8932605 0.9820310
-2  1997-2010 0.7454543 0.03850245 Inf 0.6699909 0.8209177
-3  2010-2020 0.7426552 0.04371710 Inf 0.6569713 0.8283392</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s12.-contrasts-from-glm-on-dipodomys-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s12.-contrasts-from-glm-on-dipodomys-biomass.">Table S12. Contrasts from GLM on Dipodomys biomass.</h3>
-<p>Contrasts are performed on the link (logit) scale.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                    contrast   estimate        SE  df    z.ratio p.value
-1     a_pre_pb - b_pre_reorg 1.63602752 0.4372643 Inf 3.74150758  0.0005
-2    a_pre_pb - c_post_reorg 1.65072593 0.4498349 Inf 3.66962581  0.0007
-3 b_pre_reorg - c_post_reorg 0.01469841 0.3057707 Inf 0.04807003  0.9987</code></pre>
-</div>
-</div>
-<div style="page-break-after: always;"></div>
-</section>
-</section>
-<section id="c.-baileyi-proportional-biomass" class="level1">
-<h1>C. baileyi proportional biomass</h1>
-<section id="model-specification-and-selection" class="level2">
-<h2 class="anchored" data-anchor-id="model-specification-and-selection">Model specification and selection</h2>
-<p>As for kangaroo rat proportional biomass, we used a binomial generalized linear model to compare <em>C. baileyi</em> proportional biomass across time periods. Because <em>C. baileyi</em> occurs on both control and exclosure plots, we investigated whether the dynamics of <em>C. baileyi</em>’s proportional biomass differed between treatment types. We compared models incorporating separate slopes, separate intercepts, or no terms for treatment modulating the change in <em>C. baileyi</em> proportional biomass across time periods, i.e.&nbsp;comparing the full set of models:</p>
-<ul>
-<li><em>cbaileyi_proportional_biomass ~ timeperiod + treatment + timeperiod:treatment</em></li>
-<li><em>cbaileyi_proportional_biomass ~ timeperiod + treatment</em></li>
-<li><em>cbaileyi_proportional_biomass ~ timeperiod</em></li>
-</ul>
-<p>We also tested a null (intercept-only) model of no change across time periods:</p>
-<ul>
-<li><em>cbaileyi_proportional_biomass ~ 1</em></li>
-</ul>
-<p>We found that the best-fitting model incorporated effects for time period and for treatment, but no interaction between them (<em>cbaileyi_proportional_biomass ~ timeperiod + treatment</em>). We therefore proceeded with this model.</p>
-<section id="table-s13.-model-comparison-for-c.-baileyi-proportional-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s13.-model-comparison-for-c.-baileyi-proportional-biomass.">Table S13. Model comparison for C. baileyi proportional biomass.</h3>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>                                        Model.specification      AIC
-1 intercept + timeperiod + treatment + timeperiod:treatment 237.6847
-2                        intercept + timeperiod + treatment 231.2374
-3                                    intercept + timeperiod 466.4937
-4                                     intercept + treatment 346.2154
-5                                                 intercept 543.7811</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s14.-coefficients-from-glm-on-c.-baileyi-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s14.-coefficients-from-glm-on-c.-baileyi-biomass.">Table S14. Coefficients from GLM on C. baileyi biomass.</h3>
-<p>Note that “oera” is the variable name for the term for time period in these analyses, and “oplottype” refers to treatment. Coefficients are given on the link (logit) scale.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>             Estimate Std. Error   z value     Pr(&gt;|z|)
-(Intercept) -1.538798  0.1671239 -9.207525 3.337295e-20
-oera.L      -1.403286  0.2006948 -6.992140 2.707241e-12
-oplottype.L  2.270657  0.2298594  9.878462 5.161898e-23</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s15.-estimates-from-glm-on-c.-baileyi-biomass" class="level3">
-<h3 class="anchored" data-anchor-id="table-s15.-estimates-from-glm-on-c.-baileyi-biomass">Table S15. Estimates from GLM on C. baileyi biomass</h3>
-<p>Note that estimates are back-transformed onto the response scale, for interpretability.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>  Timeperiod Treatment       prob          SE  df   asymp.LCL  asymp.UCL
-1  1997-2010   Control 0.10413311 0.025580043 Inf 0.053997148 0.15426907
-2  1997-2010 Exclosure 0.74251323 0.037672724 Inf 0.668676053 0.81635042
-3  2010-2020   Control 0.01572477 0.005734104 Inf 0.004486136 0.02696341
-4  2010-2020 Exclosure 0.28384385 0.043919238 Inf 0.197763722 0.36992397</code></pre>
-</div>
-</div>
-</section>
-<section id="table-s16.-contrasts-from-glm-on-c.-baileyi-biomass." class="level3">
-<h3 class="anchored" data-anchor-id="table-s16.-contrasts-from-glm-on-c.-baileyi-biomass.">Table S16. Contrasts from GLM on C. baileyi biomass.</h3>
-<p>Contrasts are performed on the link (logit) scale.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>             Comparison Treatment estimate        SE  df z.ratio p.value
-1 1997-2010 - 2010-2020   Control 1.984546 0.2838253 Inf 6.99214       0
-2 1997-2010 - 2010-2020 Exclosure 1.984546 0.2838253 Inf 6.99214       0</code></pre>
-</div>
-</div>
-<div style="page-break-after: always;"></div>
-</section>
-</section>
-</section>
-<section id="figure-s1.-biomass-results" class="level1">
-<h1>Figure S1. Biomass results</h1>
-<div class="cell" data-fig.dim="[4,6]">
+<section id="figures" class="level1">
+<h1>Figures</h1>
+<div class="cell" data-fig.dim="[4,2]">
 <div class="cell-output-display">
 <div id="fig-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="s3_biomass_files/figure-html/fig-plot-1.png" class="img-fluid figure-img" width="384"></p>
-<figcaption class="figure-caption">Figure&nbsp;1: Dynamics of biomass and rodent community composition over time. Lines represent the ratio of biomass on exclosure plots to control plots (a), 6-month moving averages of biomass compensation (b), and the share of community-wide biomass accounted for by kangaroo rats on control plots (c), and by C. baileyi (d), on control (gold) and exclosure (blue) plots. Dotted vertical lines mark the boundaries between time periods used for statistical analysis. Horizontal lines are time-period estimates from generalized least squares (a, b) and generalized linear (c, d) models, and the semitransparent envelopes mark the 95% confidence or credible intervals.</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;1: Dynamics of biomass and rodent community composition over time. Lines represent the 6-month moving averages of biomass compensation. Dotted vertical lines mark the boundaries between time periods used for statistical analysis. Horizontal lines are time-period estimates from generalized least squares models, and the semitransparent envelopes mark the 95% confidence or credible intervals.</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <div style="page-break-after: always;"></div>
-<section id="references" class="level3">
-<h3 class="anchored" data-anchor-id="references">References</h3>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-diaz2022" class="csl-entry" role="listitem">
 Diaz, Renata M., and S. K. Morgan Ernest. 2022. <span>“Maintenance of Community Function Through Compensation Breaks down over Time in a Desert Rodent Community.”</span> <em>Ecology</em> 103 (7): e3709. <a href="https://doi.org/10.1002/ecy.3709">https://doi.org/10.1002/ecy.3709</a>.
@@ -365,7 +291,6 @@ Lenth, Russell V., Ben Bolker, Paul Buerkner, Iago Giné-Vázquez, Maxime Herve,
 Pinheiro, José, Douglas Bates, and R Core Team. 2023. <em>Nlme: <span>Linear</span> and <span>Nonlinear Mixed Effects Models</span></em>.
 </div>
 </div>
-</section>
 </section>
 
 </main>

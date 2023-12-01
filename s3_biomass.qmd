@@ -15,7 +15,6 @@ knitr::opts_chunk$set(echo = FALSE,  message = F, warning= F)
 library(soar)
 library(ggplot2)
 library(dplyr)
-library(multipanelfigure)
 library(nlme)
 library(emmeans)
 
@@ -160,7 +159,7 @@ This is a modified version of Appendix S3 from the article “Maintenance of com
 
 # Compensation
 
-Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (@fig-plot, panel B). We fit a generalized least squares (of the form *compensation ~ timeperiod*; note that "timeperiod" is coded as "oera" throughout) using the `gls` function from the R package `nlme` [@pinheiro2023]. Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the `CORCAR1` function). We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC, and we used this model to calculate estimates and contrasts using the package `emmeans` [@lenth2023]. 
+Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (@fig-plot). We fit a generalized least squares (of the form *compensation ~ timeperiod*; note that "timeperiod" is coded as "oera" throughout) using the `gls` function from the R package `nlme` [@pinheiro2023]. Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the `CORCAR1` function). We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC (@tbl-comp), and we used this model to calculate estimates and contrasts using the package `emmeans` [@lenth2023] (@tbl-ests, @tbl-contrasts). 
 
 
 
@@ -175,11 +174,10 @@ comp_mean_gls_noautoc <- gls(smgran_comp ~ oera, data = compensation)
 comp_mean_null <- gls(smgran_comp ~ 1, data = compensation)
 ```
 
-
-### Table S1. Model comparison for compensation.
+# Tables
 
 ```{r, echo = F}
-
+#| label: tbl-comp
 
 compensation_comparison<- data.frame(
   `Model specification` = c("intercept + timeperiod + autocorrelation",
@@ -193,295 +191,42 @@ compensation_comparison<- data.frame(
 )
 
 
-compensation_comparison
+knitr::kable(compensation_comparison)
 
 ```
 
 
-```{r, echo = F}
+```{r}
+#| label: tbl-ests
+
 
 comp_mean_gls_emmeans <- emmeans(comp_mean_gls, specs = ~ oera)
-
-```
-
-### Table S2. Coefficients from GLS for compensation
-
-Note that "oera" is the variable name for the term for time period in these analyses. 
-
-```{r}
-compensation_coef <- as.data.frame(summary(comp_mean_gls)$tTable)
-compensation_coef
-```
-
-
-### Table S3. Estimates from GLS for compensation 
-
-```{r}
 
 compensation_estimates <- oera_df %>%
   left_join(as.data.frame(comp_mean_gls_emmeans)) %>%
   select(-oera)
-compensation_estimates
+knitr::kable(compensation_estimates)
 
 ```
 
-### Table S4. Contrasts from GLS for compensation 
-
 ```{r}
+#| label: tbl-contrasts
+
+
 compensation_contrasts <-contrasts_df %>%
   left_join(as.data.frame(pairs(comp_mean_gls_emmeans))) %>%
   mutate(p.value = round(p.value, digits = 4)) %>%
   select(-contrast)
-compensation_contrasts
+knitr::kable(compensation_contrasts)
 
 ```
 \newpage
 
 
 
-# Total biomass ratio
 
-As for compensation, we fit a generalized least squares of the form *total_biomass_ratio ~ timeperiod*, accounting for temporal autocorrelation between monthly censuses within each time period using a continuous autoregressive autocorrelation structure of order 1. We compared this model to models fit without the timeperiod term and/or autocorrelation structure, and found the full (timeperiod plus autocorrelation) model had the best performance via AIC. We used this model for estimates and contrasts.
 
-### Table S5. Model comparison for total biomass ratio. 
-
-```{r, echo = F}
-
-totalb_mean_gls <- gls(total_e_rat ~  oera,  correlation = corCAR1(form = ~ period), data = biomass_ratio)
-
-
-totalb_mean_gls_notime <- gls(total_e_rat ~  1,  correlation = corCAR1(form = ~ period), data = biomass_ratio)
-
-totalb_mean_gls_noautoc <- gls(total_e_rat ~ oera, data = biomass_ratio)
-
-totalb_mean_null <- gls(total_e_rat ~ 1, data = biomass_ratio)
-```
-
-```{r, echo =F}
-totalb_comparison<- data.frame(
-  `Model specification` = c("intercept + timeperiod + autocorrelation",
-                            "intercept + autocorrelation",
-                            "intercept + timeperiod",
-                            "intercept"),
-  AIC = c(AIC(totalb_mean_gls),
-          AIC(totalb_mean_gls_notime),
-          AIC(totalb_mean_gls_noautoc),
-          AIC(totalb_mean_null))
-)
-
-
-totalb_comparison
-```
-
-
-```{r, echo =F}
-totalb_mean_gls_emmeans <- emmeans(totalb_mean_gls, specs = ~ oera)
-```
-
-### Table S6. Coefficients from GLS on total biomass ratio
-
-Note that "oera" is the variable name for the term for time period in these analyses. 
-
-```{r}
-
-tb_coef <- as.data.frame(summary(totalb_mean_gls)$tTable)
-
-tb_coef
-
-```
-
-
-### Table S7. Estimates from GLS on total biomass ratio
-
-```{r}
-
-totalb_estimates <- oera_df %>%
-  left_join(as.data.frame(totalb_mean_gls_emmeans)) %>%
-  select(-oera)
-totalb_estimates
-
-```
-
-
-### Table S8. Contrasts from GLS on total biomass ratio
-
-```{r}
-totalb_contrasts <- contrasts_df %>%
-  left_join(as.data.frame(pairs(totalb_mean_gls_emmeans))) %>%
-  select(-contrast) %>%
-  mutate(p.value = round(p.value, digits = 4))
-totalb_contrasts
-
-```
-
-\newpage
-
-# Kangaroo rat (Dipodomys) proportional biomass
-
-Proportional biomass is bounded 0-1 and cannot be fit with generalized least squares. We therefore used a binomial generalized linear model with no temporal autocorrelation term, of the form *dipodomys_proportional_biomass ~ timeperiod*. We compared a model fit with a timeperiod term to an intercept-only (null) model using AIC, and found the timeperiod term improved model fit. We used this model for estimates and contrasts.
-
-```{r, echo = F}
-
-dipo_glm <- glm(dipo_prop ~ oera, family = binomial, data= dipo_c_dat)
-
-dipo_intercept_glm <- glm(dipo_prop ~ 1, family = binomial, data = dipo_c_dat)
-```
-
-### Table S9. Model comparison for Dipodomys proportional biomass.
-
-```{r, echo =F}
-
-dipo_comparison <- data.frame(
-  `Model specification` = c("intercept + timeperiod",
-                            "intercept"),
-  AIC = c(AIC(dipo_glm),
-          AIC(dipo_intercept_glm))
-)
-
-
-dipo_comparison
-```
-
-
-```{r, echo =F}
-dipoemmeans <- (emmeans(dipo_glm, specs = ~ oera))
-```
-
-
-### Table S10. Coefficients from GLM on Dipodomys biomass.
-
-Note that "oera" is the variable name for the term for time period in these analyses. Coefficients are given on the link (logit) scale.
-
-```{r}
-
-dipo_coef <- as.data.frame(summary(dipo_glm)$coefficients)
-dipo_coef
-
-```
-
-
-### Table S11. Estimates from GLM on Dipodomys biomass.
-
-Note that estimates are back-transformed onto the response scale, for interpretability.
-
-
-```{r}
-
-
-dipoestimates <- oera_df %>%
-  left_join(as.data.frame(regrid(dipoemmeans))) %>%
-  select(-oera)
-dipoestimates
-
-```
-
-
-### Table S12. Contrasts from GLM on Dipodomys biomass.
-
-Contrasts are performed on the link (logit) scale.
-
-
-```{r}
-dipocontrasts <- as.data.frame(pairs(dipoemmeans))%>%
-  mutate(p.value = round(p.value, digits = 4))
-dipocontrasts
-
-```
-
-\newpage
-
-# C. baileyi proportional biomass
-
-## Model specification and selection
-
-As for kangaroo rat proportional biomass, we used a binomial generalized linear model to compare *C. baileyi* proportional biomass across time periods. Because *C. baileyi* occurs on both control and exclosure plots, we investigated whether the dynamics of *C. baileyi*'s proportional biomass differed between treatment types. We compared models incorporating separate slopes, separate intercepts, or no terms for treatment modulating the change in *C. baileyi* proportional biomass across time periods, i.e. comparing the full set of models:
-
-- *cbaileyi_proportional_biomass ~ timeperiod + treatment + timeperiod:treatment*
-- *cbaileyi_proportional_biomass ~ timeperiod + treatment*
-- *cbaileyi_proportional_biomass ~ timeperiod*
-
-We also tested a null (intercept-only) model of no change across time periods:
-
-- *cbaileyi_proportional_biomass ~ 1*
-
-
-We found that the best-fitting model incorporated effects for time period and for treatment, but no interaction between them (*cbaileyi_proportional_biomass ~ timeperiod + treatment*). We therefore proceeded with this model. 
-
-### Table S13. Model comparison for C. baileyi proportional biomass.
-
-
-```{r, echo = F}
-
-pb_glm_interaction <- glm(pb_prop ~ oera * oplottype, family = binomial, data= pb_nozero)
-pb_glm_nointeraction <- glm(pb_prop ~ oera + oplottype, family = binomial, data= pb_nozero)
-pb_glm_notreat <- glm(pb_prop ~ oera, family = binomial, data= pb_nozero)
-pb_glm_notime <- glm(pb_prop ~ oplottype, family = binomial, data= pb_nozero)
-pb_glm_null <- glm(pb_prop ~ 1, family = binomial, data= pb_nozero)
-
-pb_comparison <- data.frame(
-  `Model specification` = c("intercept + timeperiod + treatment + timeperiod:treatment",
-                            "intercept + timeperiod + treatment",
-                            "intercept + timeperiod",
-                            "intercept + treatment",
-                            "intercept"),
-  AIC = c(AIC(pb_glm_interaction),
-          AIC(pb_glm_nointeraction),
-          AIC(pb_glm_notreat),
-          AIC(pb_glm_notime),
-          AIC(pb_glm_null))
-)
-
-
-pb_comparison
-
-pb_emmeans <- (emmeans(pb_glm_nointeraction, specs = ~ oera | oplottype))
-```
-
-### Table S14. Coefficients from GLM on C. baileyi biomass.
-
-Note that "oera" is the variable name for the term for time period in these analyses, and "oplottype" refers to treatment. Coefficients are given on the link (logit) scale.
-
-```{r}
-
-pb_coef <- as.data.frame(summary(pb_glm_nointeraction)$coefficients)
-pb_coef
-
-```
-
-
-### Table S15. Estimates from GLM on C. baileyi biomass
-
-Note that estimates are back-transformed onto the response scale, for interpretability.
-
-```{r}
-
-
-pb_estimates <- oera_df %>% 
-  right_join(as.data.frame(regrid(pb_emmeans))) %>%
-  left_join(oplot_df) %>%
-  select(Timeperiod, Treatment, prob, SE, df, asymp.LCL, asymp.UCL)
-
-pb_estimates
-
-```
-
-### Table S16. Contrasts from GLM on C. baileyi biomass.
-
-Contrasts are performed on the link (logit) scale.
-
-```{r}
-pb_contrasts <- contrasts_df %>%
-  right_join(as.data.frame(pairs(pb_emmeans))) %>%
-  left_join(oplot_df) %>%
-  mutate(p.value = round(p.value, digits = 4)) %>%
-  select(Comparison, Treatment, estimate, SE, df, z.ratio, p.value)
-pb_contrasts
-
-```
-
-\newpage
-
-# Figure S1. Biomass results
+# Figures
 
 ```{r, echo = F}
 
@@ -505,7 +250,7 @@ comp_mean_pred <-  as.data.frame(comp_mean_gls_emmeans) %>%
   mutate(oera = ordered(oera)) %>%
   right_join(compensation)
 
-comp_title <- expression(paste(bold("B."), " Biomass compensation"))
+comp_title <- "Biomass compensation"
 
 
 comp_plot <- ggplot(filter(comp_mean_pred, oplottype %in% c("CC", "EE")), aes(censusdate, emmean)) +
@@ -521,106 +266,21 @@ comp_plot <- ggplot(filter(comp_mean_pred, oplottype %in% c("CC", "EE")), aes(ce
         axis.text = element_text(size = 2 +6)) + 
   xlab("")
 
-# Total biomass plot
-
-
-totalb_mean_pred <- as.data.frame(totalb_mean_gls_emmeans) %>%
-  mutate(oera = ordered(oera)) %>%
-  right_join(biomass_ratio)
-
-tb_title <- expression(paste(bold("A."), " Total biomass ratio"))
-
-
-totalb_plot <- ggplot(filter(totalb_mean_pred, oplottype %in% c("CC", "EE")), aes(censusdate, emmean)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = lower.CL, ymax = upper.CL), alpha = .2) +
-  geom_line(aes(y = total_e_rat_ma)) +
-  ggtitle(tb_title) +
-  ylab(bquote(Btot[E] / Btot[C])) +
-  theme(legend.position = "none") +
-  ylim(-0, 1.2) +
-  geom_segment(data = era_df, aes(x = event_date, xend = event_date, y = 0, yend = 1.2), linetype = 3) +
-  theme(title = element_text(size = 2 +7), 
-        axis.title.y = element_text(size = 2 + 7),  
-        axis.text = element_text(size = 2 +6)) + 
-  xlab("")
-
-
-# C. baileyi plot
-
-pb_glm_nointeraction_se <- as.data.frame(regrid(pb_emmeans)) %>%
-  mutate(oera = as.character(oera),
-         oplottype = as.character(oplottype)) %>% 
-  right_join(mutate(pb_nozero, oera = as.character(oera), oplottype = as.character(oplottype))) %>%
-    full_join(select(pb, period, oplottype, pb_prop_ma, censusdate)) %>%
-  mutate(Treatment = ifelse(oplottype == "CC", "Control", "Exclosure"),
-         Rodents = "C. baileyi") %>%
-  rename(rod_prop_ma = pb_prop_ma)
-
-
-pb_title <- expression(paste(bold("D. "), italic("C. baileyi"), " proportional biomass"))
-
-pbplot <- ggplot(pb_glm_nointeraction_se, aes(censusdate, prob, color = Treatment, fill = Treatment)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax= asymp.UCL), alpha = .3) +
-  geom_line(aes(y = rod_prop_ma)) +
-  ylab(bquote(CB / Btot)) +
-  ggtitle(pb_title) +
-  theme(legend.position = c(.15, .75)) + 
-  both_scale + 
-  both_fscale +
-  geom_segment(data = era_df, aes(x = event_date, xend = event_date, y = 0, yend = 1), linetype = 3, inherit.aes = F) +
-  theme(axis.title.y = element_text(size = 2 + 7), 
-        legend.title = element_blank(), 
-        legend.text = element_text(size = 2 + 6), 
-        legend.key.size = unit(.1, units = "in"), 
-        title = element_text(size = 2 +7), 
-        legend.background = element_blank(), 
-        legend.direction = "vertical", 
-        axis.text = element_text(size = 2 + 6)) +   
-  xlab("Date")  
-
-# Dipodomys plot
-
-dipo_glm_se <- as.data.frame(regrid(dipoemmeans)) %>%
-  mutate(oera = as.character(oera)) %>% 
-  right_join(mutate(dipo_c_dat, oera = as.character(oera))) %>%
-  mutate(Treatment = ifelse(oplottype == "CC", "Control", "Exclosure")) %>%
-  rename(rod_prop_ma = dipo_prop_ma)
-
-dipo_title <- expression(paste(bold("C."), " Kangaroo rat proportional biomass"))
-
-
-dplot <- ggplot(filter(dipo_glm_se, oplottype == "CC"), aes(censusdate, prob)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax= asymp.UCL), alpha = .3) +
-  geom_line(aes(y = rod_prop_ma)) +
-  ylab(bquote(KR[C] / Btot[C])) +
-  xlab("") +
-  ggtitle(dipo_title) +
-  geom_segment(data = era_df, aes(x = event_date, xend = event_date, y = 0, yend = 1), linetype = 3, inherit.aes = F) +
-  theme(axis.title.y = element_text(size = 2 + 7), title = element_text(size = 2 +7), axis.text = element_text(size = 2 +6))
 
 
 ```
 
-```{r, echo = F, fig.dim = c(4,6)}
+```{r, echo = F, fig.dim = c(4,2)}
 #| label: fig-plot
-#| fig-cap: "Dynamics of biomass and rodent community composition over time. Lines represent the ratio of biomass on exclosure plots to control plots (a), 6-month moving averages of biomass compensation (b),  and the share of community-wide biomass accounted for by kangaroo rats on control plots (c), and by C. baileyi (d), on control (gold) and exclosure (blue) plots. Dotted vertical lines mark the boundaries between time periods used for statistical analysis. Horizontal lines are time-period estimates from generalized least squares (a, b) and generalized linear (c, d) models, and the semitransparent envelopes mark the 95% confidence or credible intervals."
+#| fig-cap: "Dynamics of biomass and rodent community composition over time. Lines represent the 6-month moving averages of biomass compensation. Dotted vertical lines mark the boundaries between time periods used for statistical analysis. Horizontal lines are time-period estimates from generalized least squares models, and the semitransparent envelopes mark the 95% confidence or credible intervals."
 
-all_panels <- multi_panel_figure(columns = 1, rows =4, row_spacing = 0, panel_label_type = "none") %>%
-  fill_panel(totalb_plot) %>%
-  fill_panel(comp_plot) %>%
-  fill_panel(dplot) %>%
-  fill_panel(pbplot)
-
-all_panels
+comp_plot
 ```
 
 \newpage
 
 
-### References
+# References
 
 ::: {#refs}
 
