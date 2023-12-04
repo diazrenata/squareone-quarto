@@ -1,0 +1,286 @@
+---
+title: "Appendix S3 - Biomass analysis"
+author: Renata Diaz
+output: 
+  - html_document
+bibliography: refs.bib
+---
+
+```{r setup, include=FALSE, message = F, warning= F}
+knitr::opts_chunk$set(echo = FALSE,  message = F, warning= F)
+library(soar)
+library(ggplot2)
+library(dplyr)
+library(nlme)
+library(emmeans)
+
+```
+
+
+# Background
+
+This is a modified subset of Appendix S3 from the article “Maintenance of community function through compensation breaks down over time in a desert rodent community” by Renata Diaz and S. K. Morgan Ernest, now published in _Ecology_ [@diaz2022]. 
+
+
+# Compensation
+
+Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (@fig-plot). We fit a generalized least squares (of the form *compensation ~ timeperiod*; note that "timeperiod" is coded as "oera" throughout) using the `gls` function from the R package `nlme` [@pinheiro2023]. Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the `CORCAR1` function). We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC (@tbl-comp), and we used this model to calculate estimates and contrasts using the package `emmeans` [@lenth2023] (@tbl-ests, @tbl-contrasts). 
+
+
+# Data analysis
+
+## Data preparation
+
+The following code downloads the data and prepares the `compensation` data frame for analysis.
+
+If needed, install the `soar` package:
+
+```{r, echo = T, eval = F}
+
+remotes::install_github('diazrenata/soar')
+
+```
+
+Data can be downloaded directly from the Portal data repository:
+
+```{r, echo = t}
+
+plotl <- get_plot_totals(currency = "biomass")
+
+plot_types <- list_plot_types() %>% filter(plot_type == "EE")
+```
+
+For interpretability, translating the era and treatment "names" as RMD coded them for analysis to the corresponding dates:
+
+```{r, echo = T}
+
+
+oera_df <- data.frame(
+  oera = c("a_pre_pb", "b_pre_reorg", "c_post_reorg"),
+  `Timeperiod` = c("1988-1997", "1997-2010", "2010-2020")
+)
+
+oplot_df <- data.frame(oplottype = c("CC", "EE"),
+                       `Treatment` = c("Control", "Exclosure"))
+
+contrasts_df <- data.frame(
+  contrast = c(
+    "a_pre_pb - b_pre_reorg",
+    "a_pre_pb - c_post_reorg",
+    "b_pre_reorg - c_post_reorg"
+  ),
+  Comparison = c(
+    "1988-1997 - 1997-2010",
+    "1988-1997 - 2010-2020",
+    "1997-2010 - 2010-2020"
+  )
+)
+
+```
+
+
+Because there are 5 exclosure plots and 4 control plots in these data, we remove 1 exclosure plot to achieve a balanced design. From the 5 possible exclosures to remove, we randomly select 1 using the seed 1977 (the year the Portal Project was initiated).
+
+```{r, echo = T}
+
+plot_types <- plot_types  %>% 
+  filter(plot_type == "EE")
+
+set.seed(1977) 
+remove_plot <- sample(plot_types$plot, 1, F) # results in removing plot 19
+
+plotl <- plotl %>%
+  filter(plot != remove_plot)
+```
+
+
+Finally, take treatment-level means and calculate the compensation variable:
+
+
+```{r, echo = T}
+# Treatment-level means:
+treatl <- plots_to_treatment_means(plotl) 
+
+# Format column types
+treatl <- treatl %>%
+  mutate(censusdate = as.Date(censusdate),
+         oera = ordered(oera),
+         oplottype = ordered(oplottype))
+
+compensation <- get_compensation(treatl)
+
+```
+
+## GLS model
+
+The following code fits the GLS models:
+
+```{r, echo = T}
+
+
+comp_mean_gls <-
+  gls(smgran_comp ~ oera,
+      correlation = corCAR1(form = ~ period),
+      data = compensation)
+
+comp_mean_gls_notime <-
+  gls(smgran_comp ~ 1,
+      correlation = corCAR1(form = ~ period),
+      data = compensation)
+
+comp_mean_gls_noautoc <-
+  gls(smgran_comp ~ oera, data = compensation)
+
+comp_mean_null <- gls(smgran_comp ~ 1, data = compensation)
+```
+
+
+Model comparison via AIC:
+
+```{r, echo = T}
+
+
+
+compensation_comparison <- data.frame(
+  `Model specification` = c(
+    "intercept + timeperiod + autocorrelation",
+    "intercept + autocorrelation",
+    "intercept + timeperiod",
+    "intercept"
+  ),
+  AIC = c(
+    AIC(comp_mean_gls),
+    AIC(comp_mean_gls_notime),
+    AIC(comp_mean_gls_noautoc),
+    AIC(comp_mean_null)
+  )
+)
+
+```
+
+Calculate estimates:
+
+
+```{r, echo = T}
+
+
+comp_mean_gls_emmeans <- emmeans(comp_mean_gls, specs = ~ oera)
+
+compensation_estimates <- oera_df %>%
+  left_join(as.data.frame(comp_mean_gls_emmeans)) %>%
+  select(-oera)
+
+```
+
+
+
+Calculate contrasts:
+
+```{r, echo = T}
+
+
+compensation_contrasts <-contrasts_df %>%
+  left_join(as.data.frame(pairs(comp_mean_gls_emmeans))) %>%
+  mutate(p.value = round(p.value, digits = 4)) %>%
+  select(-contrast)
+
+```
+
+
+# Results
+
+## Tables
+
+
+```{r, echo = F}
+#| label: tbl-comp
+#| tbl-cap: "Comparisons for GLS on compensation."
+
+
+
+knitr::kable(compensation_comparison)
+
+```
+
+
+```{r}
+#| label: tbl-ests
+#| tbl-cap: "Estimates for GLS on compensation."
+
+
+knitr::kable(compensation_estimates)
+
+```
+
+```{r}
+#| label: tbl-contrasts
+#| tbl-cap: "Contrasts for GLS on compensation."
+
+knitr::kable(compensation_contrasts)
+
+```
+\newpage
+
+
+
+
+
+## Figures
+
+```{r, echo = F}
+
+
+# For figures:
+
+theme_set(theme_bw())
+
+both_scale <- scale_color_viridis_d(option = "cividis", begin = .1, end = .8, direction = -1)
+both_fscale <- scale_fill_viridis_d(option = "cividis", begin = .1, end = .8, direction = -1)
+
+era_df <- make_era_df()
+# Alternatively, get the era_df from `data/`:
+# era_df <- read.csv(here::here("data", "era_df.csv"))
+era_df <- era_df %>%
+  mutate(event_date = as.Date(event_date),
+         no_name = "")
+
+# Compensation plot
+comp_mean_pred <-  as.data.frame(comp_mean_gls_emmeans) %>%
+  mutate(oera = ordered(oera)) %>%
+  right_join(compensation)
+
+comp_title <- "Biomass compensation"
+
+
+comp_plot <- ggplot(filter(comp_mean_pred, oplottype %in% c("CC", "EE")), aes(censusdate, emmean)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower.CL, ymax = upper.CL), alpha = .2) +
+  geom_line(aes(y = smgran_comp_ma)) +
+  ggtitle(comp_title) +
+  ylab(bquote((SG[E] - SG[C]) / KR[C])) +
+  geom_segment(data = era_df, aes(x = event_date, xend = event_date, y = -.05, yend = 1.4), linetype = 3)+
+  xlab("") +
+  theme(title = element_text(size = 2 +7),
+        axis.title.y = element_text(size = 2 + 7), 
+        axis.text = element_text(size = 2 +6)) + 
+  xlab("")
+
+
+
+```
+
+```{r, echo = F, fig.dim = c(4,2)}
+#| label: fig-plot
+#| fig-cap: "Dynamics of biomass and rodent community composition over time. Lines represent the 6-month moving averages of biomass compensation. Dotted vertical lines mark the boundaries between time periods used for statistical analysis. Horizontal lines are time-period estimates from generalized least squares models, and the semitransparent envelopes mark the 95% confidence or credible intervals."
+
+comp_plot
+```
+
+\newpage
+
+
+# References
+
+::: {#refs}
+
+:::
