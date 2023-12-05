@@ -1,0 +1,12 @@
+name: s3_biomass_as_quarto
+title: s3_biomass_as_quarto
+username: renatadiaz
+account: renatadiaz
+server: viz.datascience.arizona.edu
+hostUrl: https://viz.datascience.arizona.edu/__api__
+appId: 955
+bundleId: 4023
+url: https://viz.datascience.arizona.edu:443/content/41cf94f2-9354-43d4-9301-99349f4a5586/
+version: 1
+asMultiple: FALSE
+asStatic: TRUE

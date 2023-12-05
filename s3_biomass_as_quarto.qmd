@@ -5,16 +5,18 @@ author:
     orcid: 0000-0003-0803-4734
     email: renata.diaz@weecology.org
 format: 
-    gfm
+    html:
+      echo: true
+      message: false
+      warning: false
+      code-fold: true
 bibliography: refs.bib
+
 ---
 
 ```{r}
 #| label: setup
 #| include: false
-#| message: !expr F
-#| warning: !expr F
-knitr::opts_chunk$set(echo = FALSE,  message = F, warning= F)
 library(soar)
 library(ggplot2)
 library(dplyr)
@@ -31,7 +33,11 @@ This is a modified subset of Appendix S3 from the article “Maintenance of comm
 
 # Compensation
 
-Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (@fig-plot). We fit a generalized least squares (of the form *compensation ~ timeperiod*; note that "timeperiod" is coded as "oera" throughout) using the `gls` function from the R package `nlme` [@pinheiro2023]. Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the `CORCAR1` function). We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC (@tbl-comp), and we used this model to calculate estimates and contrasts using the package `emmeans` [@lenth2023] (@tbl-ests, @tbl-contrasts). 
+Compensation refers to the degree to which the remaining species on kangaroo rat removal plots absorb resources made available via kangaroo rat removal (@fig-plot). 
+We fit a generalized least squares (of the form *compensation ~ timeperiod*; note that "timeperiod" is coded as "oera" throughout) using the `gls` function from the R package `nlme` [@pinheiro2023]. 
+Because values from monthly censuses within each time period are subject to temporal autocorrelation, we included a continuous autoregressive temporal autocorrelation structure of order 1 (using the `CORCAR1` function). 
+We compared this model to models fit without the autocorrelation structure and without the time period term using AIC. 
+The model with both the time period term and the autocorrelation structure was the best-fitting model via AIC (@tbl-comp), and we used this model to calculate estimates and contrasts using the package `emmeans` [@lenth2023] (@tbl-ests, @tbl-contrasts). 
 
 
 # Data analysis
@@ -43,7 +49,6 @@ The following code downloads the data and prepares the `compensation` data frame
 If needed, install the `soar` package:
 
 ```{r}
-#| echo: !expr T
 #| eval: !expr F
 
 remotes::install_github('diazrenata/soar')
@@ -53,7 +58,7 @@ remotes::install_github('diazrenata/soar')
 Data can be downloaded directly from the Portal data repository:
 
 ```{r}
-#| echo: !expr t
+
 
 plotl <- get_plot_totals(currency = "biomass")
 
@@ -63,7 +68,7 @@ plot_types <- list_plot_types() %>% filter(plot_type == "EE")
 For interpretability, translating the era and treatment "names" as RMD coded them for analysis to the corresponding dates:
 
 ```{r}
-#| echo: !expr T
+
 
 
 oera_df <- data.frame(
@@ -90,10 +95,11 @@ contrasts_df <- data.frame(
 ```
 
 
-Because there are 5 exclosure plots and 4 control plots in these data, we remove 1 exclosure plot to achieve a balanced design. From the 5 possible exclosures to remove, we randomly select 1 using the seed 1977 (the year the Portal Project was initiated).
+Because there are 5 exclosure plots and 4 control plots in these data, we remove 1 exclosure plot to achieve a balanced design. 
+From the 5 possible exclosures to remove, we randomly select 1 using the seed 1977 (the year the Portal Project was initiated).
 
 ```{r}
-#| echo: !expr T
+
 
 plot_types <- plot_types  %>% 
   filter(plot_type == "EE")
@@ -110,7 +116,7 @@ Finally, take treatment-level means and calculate the compensation variable:
 
 
 ```{r}
-#| echo: !expr T
+
 # Treatment-level means:
 treatl <- plots_to_treatment_means(plotl) 
 
@@ -129,7 +135,7 @@ compensation <- get_compensation(treatl)
 The following code fits the GLS models:
 
 ```{r}
-#| echo: !expr T
+
 
 
 comp_mean_gls <-
@@ -152,7 +158,7 @@ comp_mean_null <- gls(smgran_comp ~ 1, data = compensation)
 Model comparison via AIC:
 
 ```{r}
-#| echo: !expr T
+
 
 
 
@@ -177,7 +183,7 @@ Calculate estimates:
 
 
 ```{r}
-#| echo: !expr T
+
 
 
 comp_mean_gls_emmeans <- emmeans(comp_mean_gls, specs = ~ oera)
@@ -193,7 +199,7 @@ compensation_estimates <- oera_df %>%
 Calculate contrasts:
 
 ```{r}
-#| echo: !expr T
+
 
 
 compensation_contrasts <-contrasts_df %>%
